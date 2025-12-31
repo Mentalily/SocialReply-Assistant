@@ -1,0 +1,41 @@
+# Python 编译缓存
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境
+env/
+venv/
+.venv/
+
+# PyCharm 配置文件
+.idea/
+*.iml
+
+# 日志文件
+*.log
+
+# 数据文件
+data/
+
+# 输出文件、模型、checkpoint 等
+*.h5
+*.ckpt
+*.pt
+*.joblib
+*.pickle
+*.pkl
+
+# 操作系统生成的文件
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# 环境变量
+.env
+__pycache__/
+data/*.pkl
+
+backup/*
