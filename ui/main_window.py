@@ -2,8 +2,8 @@ import pyperclip
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QTextEdit,
                              QPushButton, QHBoxLayout)
 from PyQt5.QtCore import Qt, pyqtSignal, QThread, QObject
-from PyQt5.QtGui import QFont
-
+from PyQt5.QtGui import QFont, QCursor, QIcon
+from config import Config
 
 # --- 工作线程类 ---
 class ReplyWorker(QThread):
@@ -33,8 +33,10 @@ class MainWindow(QWidget):
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
     def initUI(self):
-        self.setWindowTitle('社交语气分析助手')
+        self.setWindowTitle('SocialReply-Assistant')
         self.setGeometry(100, 100, 450, 500)  # 稍微高一点，放回复
+        # ✨ 2. 设置窗口图标 (只需这一行)
+        self.setWindowIcon(QIcon(Config.ICON_PATH))
         self.setStyleSheet("background-color: #f5f6f7;")  # 稍微灰一点的背景，护眼
 
         layout = QVBoxLayout()
@@ -93,6 +95,16 @@ class MainWindow(QWidget):
         # 调用业务层
         label, score = self.sentiment_engine.predict(text)
         self.result_label.setText(f"{label} (置信度: {score:.2f})")
+
+        # ================== ✨ 弹窗显示鼠标旁 ==================
+        # 1. 获取当前鼠标在屏幕上的绝对坐标
+        cursor_pos = QCursor.pos()
+
+        # 2. 移动窗口到鼠标旁边
+        # x() + 20, y() + 20 是为了稍微错开一点，不挡住你选中的文字
+        self.move(cursor_pos.x() + 20, cursor_pos.y() + 20)
+        # ================== ✨ 新增代码结束 ==================
+
         self.showNormal()
         self.activateWindow()
 
