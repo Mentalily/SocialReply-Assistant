@@ -1,13 +1,15 @@
 import pyperclip
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QTextEdit,
-                             QPushButton, QHBoxLayout)
+                             QPushButton, QHBoxLayout, QScrollArea)
 from PyQt5.QtCore import Qt, pyqtSignal, QThread, QObject
 from PyQt5.QtGui import QFont, QCursor, QIcon
+from ui.reply_card import ReplyCard
 from config import Config
+
 
 # --- 工作线程类 ---
 class ReplyWorker(QThread):
-    finished = pyqtSignal(str)
+    finished = pyqtSignal(list)  # 信号携带列表数据
 
     def __init__(self, llm_engine, text, sentiment):
         super().__init__()
@@ -16,16 +18,15 @@ class ReplyWorker(QThread):
         self.sentiment = sentiment
 
     def run(self):
-        # 调用业务层的逻辑
-        result = self.llm_engine.generate_reply(self.text, self.sentiment)
-        self.finished.emit(result)
+        # 调用业务层的逻辑，获取回复列表
+        result_list = self.llm_engine.generate_reply(self.text, self.sentiment)
+        self.finished.emit(result_list)
 
 
 # --- 主窗口类 ---
 class MainWindow(QWidget):
     def __init__(self, sentiment_engine, llm_engine):
         super().__init__()
-        # 依赖注入：窗口不负责创建引擎，而是由外部传入
         self.sentiment_engine = sentiment_engine
         self.llm_engine = llm_engine
 
@@ -34,10 +35,9 @@ class MainWindow(QWidget):
 
     def initUI(self):
         self.setWindowTitle('SocialReply-Assistant')
-        self.setGeometry(100, 100, 450, 500)  # 稍微高一点，放回复
-        # ✨ 2. 设置窗口图标 (只需这一行)
+        self.setGeometry(100, 100, 550, 550)
         self.setWindowIcon(QIcon(Config.ICON_PATH))
-        self.setStyleSheet("background-color: #f5f6f7;")  # 稍微灰一点的背景，护眼
+        self.setStyleSheet("background-color: #f5f6f7;")
 
         layout = QVBoxLayout()
 
@@ -56,23 +56,31 @@ class MainWindow(QWidget):
         self.result_label.setStyleSheet("background: #e9ecef; border-radius: 4px; padding: 10px;")
         layout.addWidget(self.result_label)
 
-        # 3. 回复生成区
-        layout.addWidget(QLabel("💡 高情商回复参考:"))
-        self.reply_area = QTextEdit()
-        self.reply_area.setPlaceholderText("点击下方按钮，AI将为你生成三种回复策略...")
-        self.reply_area.setStyleSheet("border: 1px solid #ddd; border-radius: 4px; padding: 5px; background: white;")
-        layout.addWidget(self.reply_area)
+        # 3. 回复生成区 (ScrollArea 容器)
+        layout.addWidget(QLabel("💡 建议回复 (点击复制):"))
+
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setStyleSheet("border: none; background-color: transparent;")
+
+        self.scroll_content = QWidget()
+        self.replies_layout = QVBoxLayout(self.scroll_content)
+        self.replies_layout.setContentsMargins(0, 0, 0, 0)
+        self.replies_layout.addStretch()  # 弹簧
+
+        self.scroll_area.setWidget(self.scroll_content)
+        layout.addWidget(self.scroll_area)
 
         # 4. 按钮区
         btn_layout = QHBoxLayout()
 
-        self.btn_api = QPushButton("✨ 生成高情商回复")
+        self.btn_api = QPushButton("✨ 生成回复")
         self.btn_api.clicked.connect(self.start_api)
         self.btn_api.setStyleSheet("""
-                    QPushButton { background-color: #007bff; color: white; border-radius: 5px; padding: 8px; font-weight: bold; }
-                    QPushButton:hover { background-color: #0056b3; }
-                    QPushButton:disabled { background-color: #a0a0a0; }
-                """)
+            QPushButton { background-color: #007bff; color: white; border-radius: 5px; padding: 8px; font-weight: bold; }
+            QPushButton:hover { background-color: #0056b3; }
+            QPushButton:disabled { background-color: #a0a0a0; }
+        """)
 
         self.btn_close = QPushButton("关闭")
         self.btn_close.clicked.connect(self.hide)
@@ -85,36 +93,57 @@ class MainWindow(QWidget):
         self.setLayout(layout)
 
     def handle_clipboard(self):
-        """核心逻辑：被 Controller 或 Main 调用"""
+        self.clear_replies()
+        self.btn_api.setText("✨ 生成回复")
+
         text = pyperclip.paste()
         if not text: return
 
         self.text_area.setText(text)
         self.btn_api.setEnabled(True)
 
-        # 调用业务层
         label, score = self.sentiment_engine.predict(text)
         self.result_label.setText(f"{label} (置信度: {score:.2f})")
 
-        # ================== ✨ 弹窗显示鼠标旁 ==================
-        # 1. 获取当前鼠标在屏幕上的绝对坐标
+        # 移动鼠标位置
         cursor_pos = QCursor.pos()
-
-        # 2. 移动窗口到鼠标旁边
-        # x() + 20, y() + 20 是为了稍微错开一点，不挡住你选中的文字
         self.move(cursor_pos.x() + 20, cursor_pos.y() + 20)
-        # ================== ✨ 新增代码结束 ==================
 
         self.showNormal()
         self.activateWindow()
 
     def start_api(self):
+        """修复后的 API 调用逻辑"""
         text = self.text_area.toPlainText()
         sentiment = self.result_label.text()
-        self.reply_area.setText("思考中...")
-        self.btn_api.setEnabled(False)
 
-        # 启动线程
+        self.btn_api.setText("生成中...")  # 修复点
+        self.btn_api.setEnabled(False)
+        self.clear_replies()
+
         self.worker = ReplyWorker(self.llm_engine, text, sentiment)
-        self.worker.finished.connect(lambda res: [self.reply_area.setText(res), self.btn_api.setEnabled(True)])
+        # 修复点：连接到正确的槽函数，而不是 lambda
+        self.worker.finished.connect(self.on_api_finished)
         self.worker.start()
+
+    def on_api_finished(self, replies_list):
+        """API 返回后，动态生成卡片"""
+        self.btn_api.setEnabled(True)
+        self.btn_api.setText("✨ 重新生成")
+
+        for reply_text in replies_list:
+            card = ReplyCard(reply_text)
+            # 在倒数第1个位置插入 (即弹簧之前)
+            count = self.replies_layout.count()
+            if count > 0:
+                self.replies_layout.insertWidget(count - 1, card)
+            else:
+                self.replies_layout.addWidget(card)
+
+    def clear_replies(self):
+        """清空界面上的卡片"""
+        while self.replies_layout.count() > 1:  # 保留最后一个 Stretch
+            item = self.replies_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
