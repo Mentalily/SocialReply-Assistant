@@ -1,7 +1,8 @@
 import pyperclip
-from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton, QMessageBox
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QFrame, QHBoxLayout, QLabel, QPushButton
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QCursor
+from config import THEME
 
 
 class ReplyCard(QFrame):
@@ -31,6 +32,7 @@ class ReplyCard(QFrame):
                 color: #252422;
                 font-size: 13px;
                 line-height: 1.4; /* 增加行高，阅读更舒服 */
+            }
         """)
 
         layout = QHBoxLayout()
@@ -47,21 +49,26 @@ class ReplyCard(QFrame):
         self.btn_copy.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_copy.setFixedSize(50, 25)
         self.btn_copy.clicked.connect(self.copy_text)
-        self.btn_copy.setStyleSheet("""
-            QPushButton {
+
+        self.default_btn_style = f"""
+            QPushButton {{
                 background-color: #f0f0f0;
                 border: none;
                 border-radius: 4px;
                 color: #555;
                 font-size: 12px;
-            }
-            QPushButton:hover {
+                font-weight: bold;
+                padding: 2px;
+            }}
+            QPushButton:hover {{
                 background-color: #e0e0e0;
-                color: #000;
-            }
-        """)
-        layout.addWidget(self.btn_copy)
+                color: {THEME["text_sub"]};
+            }}
+        """
 
+        self.btn_copy.setStyleSheet(self.default_btn_style)
+
+        layout.addWidget(self.btn_copy)
         self.setLayout(layout)
 
     def copy_text(self):
@@ -70,6 +77,23 @@ class ReplyCard(QFrame):
 
         # 让按钮文字变一下，提示用户成功了
         self.btn_copy.setText("Done")
-        self.btn_copy.setStyleSheet("background-color: #d4edda; color: #155724;")  # 变绿
+        self.btn_copy.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {THEME['success']};
+                color: {THEME['text_sub']};
+                border-radius: 4px;
+                font-size: 12px;
+                font-weight: bold;
+                padding: 2px;
+            }}
+        """)  # 变绿
 
         # 1秒后变回去 (可选，需要QTimer，这里简单处理就不变回去了，或者下次打开重置)
+        QTimer.singleShot(400, self.reset_button)
+
+    def reset_button(self):
+        """恢复原来的样子"""
+        # 恢复文字
+        self.btn_copy.setText("Copy")
+        # 恢复样式 (使用我们在 initUI 里定义的变量)
+        self.btn_copy.setStyleSheet(self.default_btn_style)

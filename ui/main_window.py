@@ -93,7 +93,7 @@ class MainWindow(QWidget):
                 margin: 0px;
             }}
             QScrollBar::handle:vertical {{
-                background: #ccc5b9; /* 滑块颜色 */
+                background: {THEME["scroll_handle"]}; /* 滑块颜色 */
                 min-height: 20px;
                 border-radius: 3px;
             }}
