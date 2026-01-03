@@ -13,15 +13,24 @@ class ReplyCard(QFrame):
     def initUI(self):
         # 卡片样式：白底，圆角，浅边框
         self.setStyleSheet("""
-            ReplyCard {
-                background-color: white;
-                border: 1px solid #e0e0e0;
-                border-radius: 6px;
-                margin-bottom: 5px;
+            QFrame {
+                background-color: #FFFFFF;
+                border: 1px solid #EEF2F6;
+                border-radius: 8px;
+                /* 稍微给点底部边框模拟立体感 */
+                border-bottom: 2px solid #E2E8F0; 
             }
-            ReplyCard:hover {
-                border: 1px solid #0078d7; /* 鼠标悬停变蓝 */
+            QFrame:hover {
+                background-color: #F8FAFC;
+                border: 1px solid #EF8257; /* 悬停变蓝框 */
+                border-bottom: 2px solid #3B82F6;
             }
+            QLabel {
+                border: none;
+                background: transparent;
+                color: #252422;
+                font-size: 13px;
+                line-height: 1.4; /* 增加行高，阅读更舒服 */
         """)
 
         layout = QHBoxLayout()
@@ -30,11 +39,11 @@ class ReplyCard(QFrame):
         # 1. 回复内容 (自动换行)
         self.lbl_text = QLabel(self.text_content)
         self.lbl_text.setWordWrap(True)  # 允许长文本换行
-        self.lbl_text.setStyleSheet("border: none; color: #333; font-size: 13px;")
+        self.lbl_text.setStyleSheet("border: none; color: #54798C; font-size: 23px;")
         layout.addWidget(self.lbl_text, stretch=1)  # stretch=1 表示占满剩余空间
 
         # 2. 复制按钮
-        self.btn_copy = QPushButton("复制")
+        self.btn_copy = QPushButton("Copy")
         self.btn_copy.setCursor(QCursor(Qt.PointingHandCursor))
         self.btn_copy.setFixedSize(50, 25)
         self.btn_copy.clicked.connect(self.copy_text)
@@ -44,6 +53,7 @@ class ReplyCard(QFrame):
                 border: none;
                 border-radius: 4px;
                 color: #555;
+                font-size: 12px;
             }
             QPushButton:hover {
                 background-color: #e0e0e0;
@@ -59,7 +69,7 @@ class ReplyCard(QFrame):
         pyperclip.copy(self.text_content)
 
         # 让按钮文字变一下，提示用户成功了
-        self.btn_copy.setText("已复制")
+        self.btn_copy.setText("Done")
         self.btn_copy.setStyleSheet("background-color: #d4edda; color: #155724;")  # 变绿
 
         # 1秒后变回去 (可选，需要QTimer，这里简单处理就不变回去了，或者下次打开重置)
