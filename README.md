@@ -20,6 +20,7 @@ SocialReply Assistant 是一个基于 **PyQt5** 和 **混合AI模型**（本地�
 * **操作系统**：Windows 10/11 (推荐)，macOS 或 Linux (需自行配置热键权限)
 * **Python 版本**：Python 3.8 及以上
 * **网络**：需要连接互联网以调用 LLM API
+  * 本项目默认调用的模型为ChatECNU，可查看说明文档👉[华东师范大学开发者平台](https://developer.ecnu.edu.cn/vitepress/llm/model.html)
 
 ---
 
@@ -41,7 +42,6 @@ pip install -r requirements.txt
 请确保根目录下包含 data 文件夹，且内部包含以下预训练模型文件（已随代码提交）：
 - `data/sentiment_model.pkl` (逻辑回归模型)
 - `data/tfidf_vectorizer.pkl` (TF-IDF 向量化器)
-- `data/hit_stopwords.txt` (停用词表)
 
 ### 4. 配置文件设置 (重要!)
 本项目通过环境变量管理 API 密钥。
@@ -91,7 +91,7 @@ SocialReplyAssistant/
 ---
 ## ⚠️ 注意事项
 
-- **热键冲突**：如果 `Ctrl+Shift+C` 无法唤起，可能是与其他软件（如显卡驱动）热键冲突，可在 main.py 中修改热键组合。
+- **热键冲突**：如果 `Ctrl+Shift+C` 无法唤起，可能是与其他软件（如显卡驱动）热键冲突，可在 `main.py` 中修改热键组合。
 
 - **API 额度**：请确保 `.env` 中的 API Key 有剩余额度，否则无法生成回复建议。
 - **⚠️冗余文件**：项目目录下的`./app`和`./backup`文件夹为开发过程中的实验性代码，**仅作存档保留，请勿运行**，所有核心功能均通过 `main.py` 启动。
