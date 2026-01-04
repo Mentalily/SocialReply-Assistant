@@ -1,13 +1,13 @@
 {
-    "_comment_theme": "芝士海盐，配色方案来源小红书",
+    "_comment_theme": "芝士海盐",
     "_comment_bg": "这是背景色",
     "app_bg": "#FFF6E7",
     "_comment_primary": "这个用来作按钮的颜色",
-    "primary": "#CAE4F5",
+    "primary": "#C8E3F6",
     "_comment_ph": "这个用来作按钮悬浮颜色",
     "primary_hover": "#94C2E3",
     "_comment_main": "这个是字体颜色",
-    "text_main": "#56798D",
+    "text_main": "#54798C",
     "_comment_sub": "字体备用颜色，用于复制粘贴按钮上",
     "text_sub": "#64748B",
     "card_bg": "#FFFFFF",
@@ -21,5 +21,6 @@
     "scroll_handle": "#ccc5b9",
     "fontsize_main": "24px",
     "fontsize_sub": "23px",
-    "fontsize_other": "13px"
+    "fontsize_other": "13px",
+    "_comment_": "pycharm调整配色太麻烦了，对着十六进制也不知道是什么色，就这样吧，剩下的太难抽取了"
 }

@@ -41,7 +41,7 @@ class ReplyCard(QFrame):
         # 1. 回复内容 (自动换行)
         self.lbl_text = QLabel(self.text_content)
         self.lbl_text.setWordWrap(True)  # 允许长文本换行
-        self.lbl_text.setStyleSheet("border: none; color: #54798C; font-size: 23px;")
+        self.lbl_text.setStyleSheet(f"border: none; color: {THEME['text_main']}; font-size: 23px;")
         layout.addWidget(self.lbl_text, stretch=1)  # stretch=1 表示占满剩余空间
 
         # 2. 复制按钮

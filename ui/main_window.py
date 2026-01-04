@@ -1,7 +1,7 @@
 import pyperclip
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QTextEdit,
                              QPushButton, QHBoxLayout, QScrollArea)
-from PyQt5.QtCore import Qt, pyqtSignal, QThread, QObject
+from PyQt5.QtCore import Qt, pyqtSignal, QThread
 from PyQt5.QtGui import QFont, QCursor, QIcon
 from ui.reply_card import ReplyCard
 from config import Config, THEME
@@ -40,10 +40,10 @@ class MainWindow(QWidget):
         self.setStyleSheet(f"""
             /* 1. 全局背景和字体 */
             QWidget {{
-                background-color: #FFF6E7;
+                background-color: {THEME["app_bg"]};
                 font-family: 'Microsoft YaHei', sans-seri;
-                font-size: 24px;
-                color: #54798C;
+                font-size: {THEME["fontsize_main"]};
+                color: {THEME["text_main"]};
             }}
             /* 2. 原文输入框 */
             QTextEdit {{
@@ -51,7 +51,7 @@ class MainWindow(QWidget):
                 border: 1px solid #252422;
                 border-radius: 10px;
                 padding: 8px;
-                color: #54798C;
+                color: {THEME["text_main"]};
             }}
             /* 3. 结果标签 (动态颜色在代码里覆盖，这里设基础形) */
             QLabel#result_label {{
@@ -116,7 +116,7 @@ class MainWindow(QWidget):
         self.result_label = QLabel("等待划词...")
         self.result_label.setFont(QFont("Microsoft YaHei", 12, QFont.Bold))
         self.result_label.setAlignment(Qt.AlignCenter)
-        self.result_label.setStyleSheet("background: #C8E3F6; border-radius: 8px; padding: 10px; color: #54798C;")
+        self.result_label.setStyleSheet(f"background: {THEME['primary']}; border-radius: 8px; padding: 10px; color: {THEME['text_main']};")
         layout.addWidget(self.result_label)
 
         # 3. 回复生成区 (ScrollArea 容器)
@@ -139,10 +139,20 @@ class MainWindow(QWidget):
 
         self.btn_api = QPushButton("✨ 生成回复")
         self.btn_api.clicked.connect(self.start_api)
-        self.btn_api.setStyleSheet("""
-            QPushButton { background-color: #C8E3F6; color: #54798C; border-radius: 8px; padding: 8px; font-weight: bold; }
-            QPushButton:hover { background-color: #94C2E3; }
-            QPushButton:disabled { background-color: #95E6E1; }
+        self.btn_api.setStyleSheet(f"""
+            QPushButton {{ 
+                background-color: {THEME['primary']}; 
+                color: {THEME["text_main"]}; 
+                border-radius: 8px; 
+                padding: 8px; 
+                font-weight: bold; 
+            }}
+            QPushButton:hover {{
+                background-color: {THEME['primary_hover']}; 
+            }}
+            QPushButton:disabled {{
+                background-color: {THEME['processing']}; 
+            }}
         """)
 
 
