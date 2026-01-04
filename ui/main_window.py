@@ -1,7 +1,7 @@
 import pyperclip
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QTextEdit,
                              QPushButton, QHBoxLayout, QScrollArea)
-from PyQt5.QtCore import Qt, pyqtSignal, QThread
+from PyQt5.QtCore import Qt, pyqtSignal, QThread, QEvent, QTimer
 from PyQt5.QtGui import QFont, QCursor, QIcon
 from ui.reply_card import ReplyCard
 from config import Config, THEME
@@ -155,8 +155,6 @@ class MainWindow(QWidget):
             }}
         """)
 
-
-
         self.btn_close = QPushButton("关闭")
         self.btn_close.clicked.connect(self.hide)
         self.btn_close.setStyleSheet("padding: 8px;")
@@ -186,7 +184,13 @@ class MainWindow(QWidget):
         self.move(cursor_pos.x() + 20, cursor_pos.y() + 20)
 
         self.showNormal()
-        self.activateWindow()
+        #self.activateWindow() # 获取焦点
+
+        self.raise_()  # 2. 把它提到所有窗口的最上层 (Z轴)
+        # 3. 关键魔法：延迟 100毫秒再请求激活
+        # 为什么要延迟？因为 Windows 创建窗口需要几毫秒，
+        # 如果立刻调用 activateWindow，系统可能还没准备好，导致激活失败。
+        QTimer.singleShot(10, self.activateWindow)
 
     def start_api(self):
         """修复后的 API 调用逻辑"""
@@ -223,3 +227,29 @@ class MainWindow(QWidget):
             widget = item.widget()
             if widget:
                 widget.deleteLater()
+
+    def mouseReleaseEvent(self, event):
+        self.m_drag = False
+
+    # ✨ 新增：失去焦点事件
+    def changeEvent(self, event):
+        # 如果是窗口激活状态改变事件
+        if event.type() == QEvent.ActivationChange:
+            # 检查当前窗口是否还是“活动窗口”
+            if not self.isActiveWindow():
+                # 如果不是活动窗口了（说明用户点了别处），就隐藏
+                self.hide()
+        super().changeEvent(event)
+
+    def toggle_window(self):
+        """
+        热键开关逻辑：
+        1. 如果窗口正显示 -> 关闭它
+        2. 如果窗口隐藏中 -> 执行剪贴板分析并显示
+        """
+        if self.isVisible():
+            # 如果当前是可见的，就隐藏 (Toggle Off)
+            self.hide()
+        else:
+            # 如果当前是隐藏的，就执行原来的“分析+显示”逻辑 (Toggle On)
+            self.handle_clipboard()

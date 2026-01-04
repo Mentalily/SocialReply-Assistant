@@ -24,7 +24,8 @@ def main():
 
     # 3. 设置控制器逻辑 (Controller Logic) - 这里通过简单的信号连接
     bridge = HotkeyBridge()
-    bridge.triggered.connect(window.handle_clipboard)
+    #bridge.triggered.connect(window.handle_clipboard)
+    bridge.triggered.connect(window.toggle_window)
 
     def on_hotkey():
         bridge.triggered.emit()
@@ -32,6 +33,7 @@ def main():
     try:
         keyboard.add_hotkey('ctrl+shift+c', on_hotkey, suppress=False)
         print("🚀 程序启动成功！监听 Ctrl+Shift+C 中...")
+        print("💡 提示：按一次弹出分析，再按一次即可快速关闭窗口")
     except Exception as e:
         print(f"⚠️ 热键注册失败: {e}")
 
