@@ -16,7 +16,7 @@ venv/
 *.log
 
 # 数据文件
-data/
+data/weibo_senti_100k.csv
 
 # 输出文件、模型、checkpoint 等
 *.h5
