@@ -24,7 +24,7 @@ data/weibo_senti_100k.csv
 *.pt
 *.joblib
 *.pickle
-*.pkl
+#*.pkl
 
 # 操作系统生成的文件
 .DS_Store
@@ -36,6 +36,6 @@ Thumbs.db
 # 环境变量
 .env
 __pycache__/
-data/*.pkl
+#data/*.pkl
 
 backup/*
