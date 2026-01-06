@@ -32,7 +32,6 @@ class SentimentEngine:
             return "未知", 0.0
 
         # 分词 (保持和训练时一致)
-        # 如果训练时使用了停用词过滤，这里建议加上去停用词逻辑
         cut_text = " ".join(jieba.lcut(text))
 
         vec = self.vectorizer.transform([cut_text])
