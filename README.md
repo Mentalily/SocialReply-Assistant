@@ -38,7 +38,7 @@ cd SocialReplyAssistant
 pip install -r requirements.txt
 ```
 
-### 模型文件检查
+### 3. 模型文件检查
 请确保根目录下包含 data 文件夹，且内部包含以下预训练模型文件（已随代码提交）：
 - `data/sentiment_model.pkl` (逻辑回归模型)
 - `data/tfidf_vectorizer.pkl` (TF-IDF 向量化器)
