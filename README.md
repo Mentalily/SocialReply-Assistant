@@ -78,7 +78,9 @@ _若看到控制台输出 "🚀 程序启动成功！监听 Ctrl+Shift+C 中..."
 
 ```plaintext
 SocialReplyAssistant/
+├── app/                # ⚠ 冗余文件 (初始app、测试代码)
 ├── assets/             # 资源文件 (图标, 主题配置)
+├── backup/             # ⚠ 冗余文件 (初始代码备份)
 ├── data/               # 模型数据 (pkl文件)
 ├── services/           # 业务逻辑层 (情感分析, LLM调用)
 ├── ui/                 # 界面层 (主窗口, 卡片组件)
