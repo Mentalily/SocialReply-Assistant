@@ -201,7 +201,7 @@ class MainWindow(QWidget):
         self.btn_api.setEnabled(False)
         self.clear_replies()
 
-        self.worker = ReplyWorker(self.llm_engine, text, sentiment) # worker线程调用API，等待回复
+        self.worker = ReplyWorker(self.llm_engine, text, sentiment) # 创建新线程：worker线程调用API，等待回复
         # 修复点：连接到正确的槽函数，而不是 lambda
         self.worker.finished.connect(self.on_api_finished) # 槽函数：处理接收到信号的函数
         self.worker.start() # 开始子线程
