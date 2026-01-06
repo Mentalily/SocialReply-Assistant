@@ -194,17 +194,17 @@ class MainWindow(QWidget):
 
     def start_api(self):
         """修复后的 API 调用逻辑"""
-        text = self.text_area.toPlainText()
-        sentiment = self.result_label.text()
+        text = self.text_area.toPlainText() # QTextEdit：输入框，富文本编辑器。转为普通文本提取出来
+        sentiment = self.result_label.text() # QLabel就是简单的文本容器，直接读取
 
         self.btn_api.setText("生成中...")  # 修复点
         self.btn_api.setEnabled(False)
         self.clear_replies()
 
-        self.worker = ReplyWorker(self.llm_engine, text, sentiment)
+        self.worker = ReplyWorker(self.llm_engine, text, sentiment) # worker线程调用API，等待回复
         # 修复点：连接到正确的槽函数，而不是 lambda
-        self.worker.finished.connect(self.on_api_finished)
-        self.worker.start()
+        self.worker.finished.connect(self.on_api_finished) # 槽函数：处理接收到信号的函数
+        self.worker.start() # 开始子线程
 
     def on_api_finished(self, replies_list):
         """API 返回后，动态生成卡片"""
